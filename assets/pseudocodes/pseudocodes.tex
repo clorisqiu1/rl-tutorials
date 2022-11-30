@@ -207,6 +207,32 @@
 
 \clearpage
 
+\section{PPO-Clip算法(QIU)}
+\begin{algorithm}[H] % [H]固定位置
+    \floatname{algorithm}{{PPO-Clip算法}\footnotemark[1]\footnotemark[2]} 
+	\renewcommand{\thealgorithm}{} % 去掉算法标号
+	\caption{} 
+	\begin{algorithmic}[1] % [1]显示步数
+		\STATE 初始化策略网络(Actor)参数$\theta$和价值网络(Critic)参数$\phi$
+		\STATE 初始化Clip参数$\epsilon$
+		\FOR {回合数 = $1,2,\cdots,K$}
+			\STATE 根据策略$\pi_{\theta_k}$采样T时间步,收集{$s_t,a_t,r_t$}到经验回放$D_k$中
+			\STATE 计算折扣奖励$\hat{R_t}$
+			\STATE 根据值函数$V_{\Phi_k}$,用某种优势估计方法计算优势函数$\hat{A_t}$
+			\STATE 通过最大化目标函数$L^{CLIP}(\theta)$更新Actor参数，$\theta_{k+1} \leftarrow \theta_k$：
+			\STATE $L^{CLIP}(\theta)=frac{1}{|D_kT|} \sum_{\tau \in D_k} \sum_{t=0}^{T} min(\frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_k}(a_t|s_t)} A^{\pi_{\theta_k}}(s_t,a_t), g(\epsilon,A^{\pi_{\theta_k}}(s_t,a_t)))$\footnotemark[3]
+			\STATE 典型方法是Adam随机梯度上升
+			\STATE 根据均方误差回归拟合值函数，更新Critic参数$\Phi_{k+1} \leftarrow \Phi_k$：
+			\STATE $\frac{1}{|D_kT|} \sum_{\tau \in D_k} \sum_{t=0}^{T} (V_\Phi(s_t)-\hat{R_t})^2$
+			\STATE 典型方法是某些梯度下降算法
+		\ENDFOR
+	\end{algorithmic}
+\end{algorithm}
+\footnotetext[1]{Proximal Policy Optimization Algorithms}
+\footnotetext[2]{https://spinningup.openai.com/en/latest/algorithms/ppo.html}
+\footnotetext[3]{论文\footnotetext[1]中，$L^{CLIP}(\theta)=\hat{E_t}[min(r_t(\theta)\hat{A_t}, clip(r_t(\theta), 1-\epsilon, 1+\epsilon)\hat{A_t})]$}
+\clearpage
+
 \section{PPO-Clip算法}
 \begin{algorithm}[H] % [H]固定位置
     \floatname{algorithm}{{PPO-Clip算法}\footnotemark[1]\footnotemark[2]} 
